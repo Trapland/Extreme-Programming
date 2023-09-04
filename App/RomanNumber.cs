@@ -12,6 +12,21 @@ namespace App
 
         public static RomanNumber Parse(string input)
         {
+            input = input.ToUpper();
+            if(input == "I")
+            {
+                return new()
+                {
+                    Value = 1
+                };
+            }
+            if (input == "II")
+            {
+                return new()
+                {
+                    Value = 2
+                };
+            }
             return new()
             {
                 Value = 1

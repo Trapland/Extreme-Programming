@@ -13,6 +13,13 @@ namespace Tests
                  .Parse("I")                   //
                  .Value                        //
                  , "1 == I");                  // Повідомлення, що з'явиться при провалі тесту
+            
+            Assert.AreEqual(
+                2,
+                 RomanNumber
+                 .Parse("II")
+                 .Value
+                 , "2 == II");
         }
     }
 }
