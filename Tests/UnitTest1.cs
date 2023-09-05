@@ -4,6 +4,101 @@ namespace Tests
     [TestClass]
     public class UnitTestApp
     {
+        [TestMethod]
+        public void TestToString()
+        {
+            Dictionary<int, String> testCases = new()
+            {
+                {1, "I" },
+                {2, "II" },
+                {3, "III" },
+                {4, "IV" },
+                {5, "V" },
+                {6, "VI" },
+                {7, "VII" },
+                {8, "VIII" },
+                {9, "IX" },
+                {10, "X" },
+                {11, "XI" },
+                {12, "XII" },
+                {13, "XIII" },
+                {14, "XIV" },
+                {15, "XV" },
+                {16, "XVI" },
+                {17, "XVII" },
+                {18, "XVIII" },
+                {19, "XIX" },
+                {20, "XX" },
+                {21, "XXI" },
+                {22, "XXII" },
+                {23, "XXIII" },
+                {30, "XXX" },
+                {33, "XXXIII" },
+                {40, "XL" },
+                {44, "XLIV" },
+                {48, "XLVIII" },
+                {50, "L" },
+                {55, "LV" },
+                {59, "LIX" },
+                {64, "LXIV" },
+                {66, "LXVI" },
+                {75, "LXXV" },
+                {77, "LXXVII" },
+                {81, "LXXXI" },
+                {88, "LXXXVIII" },
+                {90, "XC" },
+                {92, "XCII" },
+                {99, "XCIX" },
+                {100, "C" },
+                {111, "CXI" },
+                {123, "CXXIII" },
+                {222, "CCXXII" },
+                {234, "CCXXXIV" },
+                {333, "CCCXXXIII" },
+                {345, "CCCXLV" },
+                {444, "CDXLIV" },
+                {456, "CDXLIV" },
+                {500, "D" },
+                {555, "DLV" },
+                {567, "DLXVII" },
+                {666, "DCLXVI" },
+                {678, "DCLXXVIII" },
+                {777, "DCCLXXVII" },
+                {789, "DCCLXXXIX" },
+                {888, "DCCCLXXXVIII" },
+                {890, "DCCCXC" },
+                {901, "CMI" },
+                {999, "CMXCIX" },
+                {1000, "M" },
+                {1111, "MCXI" },
+                {1234, "MCCXXXIV" },
+                {1317, "MCCCXVII" },
+                {1432, "MCDXXXII" },
+                {1500, "MD" },
+                {1575, "MDLXXV" },
+                {1632, "MDCXXXII" },
+                {1667, "MDCLXVII" },
+                {1734, "MDCCXXXIV" },
+                {1872, "MDCCCLXXII" },
+                {1969, "MCMLXIX" },
+                {1985, "MCMLXXXV" },
+                {2048, "MMXLVIII" },
+                {2184, "MMCLXXXIV" },
+                {2222, "MMCCXXII" },
+                {2288, "MMCCLXXXVIII" },
+                {2345, "MMCCCXLV" },
+                {2392, "MMCCCXCII" },
+                {2496, "MMCDXCVI" },
+                {2500, "MMD" },
+                {2678, "MMDCLXXVIII" },
+                {2781, "MMDCCLXXXI" },
+                {2884, "MMDCCCLXXXIV" },
+                {2958, "MMCMLVIII" },
+                {3000, "MMM" },
+            };
+            Assert.AreEqual("I", new RomanNumber(1).ToString(), "1.ToString() == I");
+        }
+
         private static Dictionary<String, int> parseTests = new()
         {
             {"I"          , 1 },
@@ -107,10 +202,14 @@ namespace Tests
             {"XXXXXXXIIIIIII"       , 77},
             {"DXXXX"       , 540},
             {"DIIIII"       , 505},
+            {"DIIIII "       , 505},
+            {" DIIIII "       , 505},
+            {" DIIIII"       , 505},
+            {"\nDIIIII\t"       , 505},
         };
 
         [TestMethod]
-        public void TestRomanNumberParse()
+        public void TestRomanNumberParseValid()
         {
             Assert.AreEqual(                   // RomanNumber.Parse("I").Value == 1
                 1,                             // Значення, що очікується (що має бути, правильний варіант)
@@ -127,10 +226,71 @@ namespace Tests
                  .Value
                  , $"{pair.Value} == {pair.Key}");
             }
-           
+
         }
+        [TestMethod]
+        public void TestRomanNumberParseNonValid()
+        {
+            // Тестування з неправильними формами чисел
+            Assert.ThrowsException<ArgumentException>(
+            () => RomanNumber.Parse(null!), "null -> ArgumentException");
+            Assert.ThrowsException<ArgumentException>(
+            () => RomanNumber.Parse(""), "'' -> ArgumentException");
+            // саме виключення, що виникло у лямбді, повертається як рез-т
+            var ex = Assert.ThrowsException<ArgumentException>(
+            () => RomanNumber.Parse("XBC"), "XBC -> ArgumentException");
+            // вимагаємо, щоб відомості про неправильну цифру ('B') було
+            // включено у повідомлення виключення
+            Assert.IsTrue(ex.Message.Contains('B'), "ex.Message should Contain 'B'");
+            Dictionary<String, Char> testCases = new()
+            {
+                { "Xx", 'x' },
+                { "Xy", 'y' },
+                { "AX", 'A' },
+                { "X C", ' ' },
+                { "X\tC", '\t' },
+                { "X\nC", '\n' },
+            };
+            foreach (var pair in testCases)
+            {
+                Assert.IsTrue(
+                    Assert.ThrowsException<ArgumentException>(
+                    () => RomanNumber.Parse(pair.Key),
+                    $"'{pair.Key}' -> ArgumentException")
+                        .Message.Contains($"'{pair.Value}'"),
+                    $"ex.Message should Contain '{pair.Value}'");
+            }
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Parse("ABC"), "'' -> ArgumentException");
+            Assert.IsTrue(ex.Message.Contains('A') || ex.Message.Contains('B'), "'ABC' ex.Message should Contain either 'A' or 'B'");
+            // * перевіримо, що повідомлення(виключення) не занадто коротке
+            // мову чи інші слова не встановлюємо, але щоб не одна літера -
+            // накладемо умову на довжину повідомлення (15 літер)
+            Assert.IsFalse(ex.Message.Length < 15, "ex.Message.Length min 15");
+        }
+
+
     }
 }
+
+/* Тестування виключень(exceptions)
+ * У системі тестування виключення - провали тесту.
+ * Тому вирази, що мають завершуватись виключеннями, оточують
+ * функціональними виразами (лямбдами). Це дозволяє перенести
+ * появу виключення у середину тестового методу, де воно буде
+ * оброблене належним чином.
+ * Особливості:
+ *  - перевіряється суворий збіг типів виключень, більш загальний
+ *    тип не зараховується як проходження тесту
+ *  - тест повертає викинуте виключення, це дозволяє накласти
+ *  умови на повідомлення, причину, тощо
+ *  
+ *  Слухання які з комбінацій вважати правильними, які ні
+ *  'X C', ' XC', 'XC ', 'XC\t', '\nXC', 'XC\n', 'X\nC',
+ *    x       v     v       v       v       v       x
+ */
+
+
 /* Основу модульних тестів складають твердження (Asserts).
  * У твердженні фігурують два значення: те, що очікується, та
  * те, що одержується.

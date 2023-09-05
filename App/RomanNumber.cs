@@ -10,19 +10,32 @@ namespace App
     {
         public int Value { get; set; }
 
+        public RomanNumber(int value = 0)
+        {
+            Value = value;
+        }
+
+        public override string ToString()
+        {
+            // відобразити значення Value у формі римського числа
+            return "I";
+        }
+
         public static RomanNumber Parse(string input)
         {
-            input = input.ToUpper();
             if (string.IsNullOrEmpty(input))
             {
                 throw new ArgumentException("Null or empty input");
             }
+            input = input.Trim();
+
             if (input == "N") return new(); // Value = 0 -- default
 
             int prev = 0;
             int current = 0;
             int result = 0;
             int lastDigitIndex = input[0] == '-' ? 1 : 0;
+
             for (int i = input.Length - 1; i >= lastDigitIndex; i--)
             {
                 current = input[i] switch
@@ -34,6 +47,7 @@ namespace App
                     'C' => 100,
                     'D' => 500,
                     'M' => 1000,
+                    _ => throw new ArgumentException($"Invalid Roman digit: '{input[i]}'"),
                 };
                 result += prev <= current ? current : -current;
                 prev = current;
