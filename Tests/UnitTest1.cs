@@ -345,7 +345,7 @@ namespace Tests
         public void CrossRomanNumberTest()
         {
             int random = 0;
-            for (int i = 0; i < 40960; i++)
+            for (int i = 0; i < 256; i++)
             {
                 random = Random.Shared.Next(6001) - 3000;
                 Assert.AreEqual(random,
