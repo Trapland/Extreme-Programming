@@ -18,7 +18,66 @@ namespace App
         public override string ToString()
         {
             // відобразити значення Value у формі римського числа
-            return "I";
+            // головна ідея - послідовне зменшення початкового числа i
+            // формування результату
+            Dictionary<int, String> parts = new()
+            {
+                {1000, "M" },
+                {900,  "CM" },
+                {500,  "D" },
+                {400,  "CD" },
+                {100,  "C" },
+                {90,  "XC" },
+                {50,  "L" },
+                {40,  "XL" },
+                {10,  "X" },
+                {9,  "IX" },
+                {5,  "V" },
+                {4,  "IV" },
+                {1,  "I" },
+            };
+            if (Value == 0)
+                return "N";
+
+            bool isNegative = Value < 0;
+            var number = isNegative ? -Value : Value;
+
+            StringBuilder sb = new();
+            if (isNegative)
+            {
+                sb.Append("-");
+            }
+            foreach (var part in parts)
+            {
+                while (number >= part.Key)
+                {
+                    sb.Append(part.Value);
+                    number -= part.Key;
+                }
+            }
+            return sb.ToString();
+
+            /*string romanNumber = "";
+
+            var number = Value;
+            if(number < 0)
+            {
+                romanNumber += "-";
+                number = -number;
+            }
+            foreach (var part in parts)
+            {
+                int num = number / part.Key;
+                if (num >= 1)
+                {
+                    for (int i = 0; i < num; i++)
+                    {
+                        romanNumber += part.Value;
+                    }
+                }
+                number -= num * part.Key;
+            }
+            return romanNumber;*/
         }
 
         public static RomanNumber Parse(string input)
