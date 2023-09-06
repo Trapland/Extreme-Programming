@@ -341,7 +341,20 @@ namespace Tests
             Assert.IsFalse(ex.Message.Length < 15, "ex.Message.Length min 15");
         }
 
-
+        [TestMethod]
+        public void CrossRomanNumberTest()
+        {
+            int random = 0;
+            for (int i = 0; i < 40960; i++)
+            {
+                random = Random.Shared.Next(6001) - 3000;
+                Assert.AreEqual(random,
+                    RomanNumber
+                 .Parse(new RomanNumber(random).ToString())
+                 .Value,
+                    $"{random}.ToString() == {random}");
+            }
+        }
     }
 }
 
