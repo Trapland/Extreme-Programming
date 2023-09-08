@@ -248,7 +248,7 @@ namespace Tests
             { "-DX"       , -510 },
             { "CMD"       , 1400 },
             { "CLI"       , 151},
-            { "LID"       , 549},
+            { "DIL"       , 549},
             { "DID"       , 999},
             { "DMC"       , 600},
             {"MMXXIII"    , 2023},
@@ -300,6 +300,9 @@ namespace Tests
             }
 
         }
+
+
+
         [TestMethod]
         public void TestRomanNumberParseNonValid()
         {
@@ -354,6 +357,19 @@ namespace Tests
                  .Value,
                     $"{random}.ToString() == {random}");
             }
+        }
+
+        [TestMethod]
+        public void TestRomanNumberParseIllegal()
+        {
+            String[] illegals = { "IIV", "IIX", "VVX", "IVX", "IIIX", "VIX" };
+            foreach (String illegal in illegals)
+            {
+                Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Parse(illegal),
+                $"'{illegal}' -> Exception");
+            }
+
         }
     }
 }

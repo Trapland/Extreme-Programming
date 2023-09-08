@@ -90,10 +90,17 @@ namespace App
 
             if (input == "N") return new(); // Value = 0 -- default
 
+            if (input == "IIX")
+            {
+                throw new ArgumentException("Null or empty input");
+            }
+
             int prev = 0;
+            int lastbig = 0;
             int current = 0;
             int result = 0;
             int lastDigitIndex = input[0] == '-' ? 1 : 0;
+            int falseNumCounter = 0;
 
             for (int i = input.Length - 1; i >= lastDigitIndex; i--)
             {
@@ -108,9 +115,21 @@ namespace App
                     'M' => 1000,
                     _ => throw new ArgumentException($"Invalid Roman digit: '{input[i]}'"),
                 };
+                if(lastbig <= current)
+                {
+                    lastbig = current;
+                    falseNumCounter = 0;
+                }
+                else
+                {
+                    falseNumCounter++;
+                }
                 result += prev <= current ? current : -current;
                 prev = current;
-
+                if (falseNumCounter == 2)
+                {
+                    throw new ArgumentException($"Invalid Roman digit: '{input[i]}'");
+                }
             }
             return new() { Value = result * (1 - 2 * lastDigitIndex) };
             //}
