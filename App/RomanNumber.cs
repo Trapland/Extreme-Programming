@@ -223,20 +223,21 @@ namespace App
              * і далі порівнюємо з наступною цифрою
              */
             //};
-            private static int DigitValue(char digit)
+
+        }
+        private static int DigitValue(char digit)
+        {
+            return digit switch
             {
-                return digit switch
-                {
-                    'I' => 1,
-                    'V' => 5,
-                    'X' => 10,
-                    'L' => 50,
-                    'C' => 100,
-                    'D' => 500,
-                    'M' => 1000,
-                    _ => throw new ArgumentException($"Invalid Roman digit: '{digit}'")
-                };
-            }
+                'I' => 1,
+                'V' => 5,
+                'X' => 10,
+                'L' => 50,
+                'C' => 100,
+                'D' => 500,
+                'M' => 1000,
+                _ => throw new ArgumentException($"Invalid Roman digit: '{digit}'")
+            };
         }
     }
 }
