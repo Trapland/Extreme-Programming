@@ -362,7 +362,46 @@ namespace Tests
         [TestMethod]
         public void TestRomanNumberParseIllegal()
         {
-            String[] illegals = { "IIV", "IIX", "VVX", "IVX", "IIIX", "VIX" };
+            String[] illegals = 
+            { 
+                "IIV",
+                "IIX",
+                "VVX",
+                "IVX",
+                "IIIX",
+                "VIX",
+                "IIIL",
+                "IIID",
+                "IIIM",
+                "IIIC",
+                "IIIVX",
+                "IIXIV",
+                "IXIIXIV",
+                "LLLC",
+                "LLC",
+                "XXXC",
+                "LLD",
+                "LLLM",
+                "DDM",
+                "XMXXM",
+                "IIM",
+                "IIL",
+                "IIC",
+                "IID",
+                "MDDM",
+                "MCCM",
+                "MCCCM",
+                "MVIM",
+                "VIIM",
+                "VIIC",
+                "VIIX",
+                "VIID",
+                "VIIL",
+                "IVID",
+                "IVIM",
+                "IVIC",
+                "IVIXX",
+            };
             foreach (String illegal in illegals)
             {
                 Assert.ThrowsException<ArgumentException>(

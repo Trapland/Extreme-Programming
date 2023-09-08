@@ -90,21 +90,16 @@ namespace App
 
             if (input == "N") return new(); // Value = 0 -- default
 
-            if (input == "IIX")
-            {
-                throw new ArgumentException("Null or empty input");
-            }
-
             int prev = 0;
-            int current = 0;
             int result = 0;
             int lastDigitIndex = input[0] == '-' ? 1 : 0;
+            int maxDigit = 0;
+            int lessDigitsCount = 0;
 
             // тест на легальність - лівіше від цифри може бути лише одна
             // цифра, що є меншою за дану (див. TestRomanNumberParseIllegal())
             // if (input == "IIX" || input == "IIV")
-            int maxDigit = 0;
-            int lessDigitsCount = 0;
+
             for (int i = input.Length - 1; i >= lastDigitIndex; i--)
             {
                 int digitValue = DigitValue(input[i]);
@@ -121,40 +116,9 @@ namespace App
                     maxDigit = digitValue;
                     lessDigitsCount = 0;
                 }
-            }
 
-            //int lastbig = 0;
-            //int falseNumCounter = 0;
-
-            for (int i = input.Length - 1; i >= lastDigitIndex; i--)
-            {
-                current = input[i] switch
-                {
-                    'I' => 1,
-                    'V' => 5,
-                    'X' => 10,
-                    'L' => 50,
-                    'C' => 100,
-                    'D' => 500,
-                    'M' => 1000,
-                    _ => throw new ArgumentException($"Invalid Roman digit: '{input[i]}'"),
-                };
-                //if(lastbig <= current)
-                //{
-                //    lastbig = current;
-                //    falseNumCounter = 0;
-                //}
-                //else
-                //{
-                //    falseNumCounter++;
-                //}
-                //if (falseNumCounter == 2)
-                //{
-                //    throw new ArgumentException($"Invalid Roman digit: '{input}'");
-                //}
-
-                result += prev <= current ? current : -current;
-                prev = current;
+                result += prev <= digitValue ? digitValue : -digitValue;
+                prev = digitValue;
             }
             return new() { Value = result * (1 - 2 * lastDigitIndex) };
             //}
