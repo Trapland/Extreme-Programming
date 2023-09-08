@@ -96,11 +96,35 @@ namespace App
             }
 
             int prev = 0;
-            int lastbig = 0;
             int current = 0;
             int result = 0;
             int lastDigitIndex = input[0] == '-' ? 1 : 0;
-            int falseNumCounter = 0;
+
+            // тест на легальність - лівіше від цифри може бути лише одна
+            // цифра, що є меншою за дану (див. TestRomanNumberParseIllegal())
+            // if (input == "IIX" || input == "IIV")
+            int maxDigit = 0;
+            int lessDigitsCount = 0;
+            for (int i = input.Length - 1; i >= lastDigitIndex; i--)
+            {
+                int digitValue = DigitValue(input[i]);
+                if (digitValue < maxDigit)
+                {
+                    lessDigitsCount += 1;
+                    if (lessDigitsCount > 1)
+                    {
+                        throw new ArgumentException(input);
+                    }
+                }
+                else
+                {
+                    maxDigit = digitValue;
+                    lessDigitsCount = 0;
+                }
+            }
+
+            //int lastbig = 0;
+            //int falseNumCounter = 0;
 
             for (int i = input.Length - 1; i >= lastDigitIndex; i--)
             {
@@ -115,21 +139,22 @@ namespace App
                     'M' => 1000,
                     _ => throw new ArgumentException($"Invalid Roman digit: '{input[i]}'"),
                 };
-                if(lastbig <= current)
-                {
-                    lastbig = current;
-                    falseNumCounter = 0;
-                }
-                else
-                {
-                    falseNumCounter++;
-                }
+                //if(lastbig <= current)
+                //{
+                //    lastbig = current;
+                //    falseNumCounter = 0;
+                //}
+                //else
+                //{
+                //    falseNumCounter++;
+                //}
+                //if (falseNumCounter == 2)
+                //{
+                //    throw new ArgumentException($"Invalid Roman digit: '{input}'");
+                //}
+
                 result += prev <= current ? current : -current;
                 prev = current;
-                if (falseNumCounter == 2)
-                {
-                    throw new ArgumentException($"Invalid Roman digit: '{input[i]}'");
-                }
             }
             return new() { Value = result * (1 - 2 * lastDigitIndex) };
             //}
@@ -178,26 +203,40 @@ namespace App
             //return new()
             //{
             //    Value = result 
-                //input.Length для тестів "I","II","III"
-                //input switch варіант для тестів "I","II","III"
-                //{
-                //    "I" => 1,
-                //    "II" => 2,
-                //    "III" => 3,
-                //}
+            //input.Length для тестів "I","II","III"
+            //input switch варіант для тестів "I","II","III"
+            //{
+            //    "I" => 1,
+            //    "II" => 2,
+            //    "III" => 3,
+            //}
 
-                //input == "I" ? 1 : 2 для тестів "I","II"
+            //input == "I" ? 1 : 2 для тестів "I","II"
 
-                /*Правило "читання" римських чисел:
-                 * Якщо цифра передує
-                 * більшій цифрі, то вона віднімається (IV, IX) - "I" передує більшій цифрі
-                 * меншій або рівній - додається (VI, II, XI)
-                 * Решту правил ігноруємо - робимо максимально "дружній" інтерфейс
-                 * 
-                 * Алгоритм - "заходимо" з правої цифри, її завжди додаємо, запам'ятовуємо,
-                 * і далі порівнюємо з наступною цифрою
-                 */
+            /*Правило "читання" римських чисел:
+             * Якщо цифра передує
+             * більшій цифрі, то вона віднімається (IV, IX) - "I" передує більшій цифрі
+             * меншій або рівній - додається (VI, II, XI)
+             * Решту правил ігноруємо - робимо максимально "дружній" інтерфейс
+             * 
+             * Алгоритм - "заходимо" з правої цифри, її завжди додаємо, запам'ятовуємо,
+             * і далі порівнюємо з наступною цифрою
+             */
             //};
+            private static int DigitValue(char digit)
+            {
+                return digit switch
+                {
+                    'I' => 1,
+                    'V' => 5,
+                    'X' => 10,
+                    'L' => 50,
+                    'C' => 100,
+                    'D' => 500,
+                    'M' => 1000,
+                    _ => throw new ArgumentException($"Invalid Roman digit: '{digit}'")
+                };
+            }
         }
     }
 }
