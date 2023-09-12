@@ -2,7 +2,7 @@ using App; // додати залежність (Dependencies - Project Reference) від проєкту A
 namespace Tests
 {
     [TestClass]
-    public class UnitTestApp
+    public class UnitTestRomanNumber
     {
         [TestMethod]
         public void TestToString()
@@ -281,7 +281,7 @@ namespace Tests
         };
 
         [TestMethod]
-        public void TestRomanNumberParseValid()
+        public void TestParseValid()
         {
             Assert.AreEqual(                   // RomanNumber.Parse("I").Value == 1
                 1,                             // Значення, що очікується (що має бути, правильний варіант)
@@ -301,10 +301,8 @@ namespace Tests
 
         }
 
-
-
         [TestMethod]
-        public void TestRomanNumberParseNonValid()
+        public void TestParseNonValid()
         {
             // Тестування з неправильними формами чисел
             Assert.ThrowsException<ArgumentException>(
@@ -325,6 +323,7 @@ namespace Tests
                 { "X C", ' ' },
                 { "X\tC", '\t' },
                 { "X\nC", '\n' },
+                { "X-C", '-' },
             };
             foreach (var pair in testCases)
             {
@@ -337,7 +336,12 @@ namespace Tests
             }
             ex = Assert.ThrowsException<ArgumentException>(
                 () => RomanNumber.Parse("ABC"), "'' -> ArgumentException");
-            Assert.IsTrue(ex.Message.Contains('A') || ex.Message.Contains('B'), "'ABC' ex.Message should Contain either 'A' or 'B'");
+
+            Assert.IsTrue(ex.Message.Contains('A') && ex.Message.Contains('B'),
+                "'ABC' ex.Message should Contain 'A' and 'B'");
+            // Для неправильних чисел вимагаємо перелік
+            // усіх цифр (символів), що не є припустимими
+
             // * перевіримо, що повідомлення(виключення) не занадто коротке
             // мову чи інші слова не встановлюємо, але щоб не одна літера -
             // накладемо умову на довжину повідомлення (15 літер)
@@ -345,7 +349,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void CrossRomanNumberTest()
+        public void CrossTest()
         {
             int random = 0;
             for (int i = 0; i < 256; i++)
@@ -360,47 +364,49 @@ namespace Tests
         }
 
         [TestMethod]
-        public void TestRomanNumberParseIllegal()
+        public void TestParseIllegal()
         {
             String[] illegals = 
             { 
                 "IIV",
                 "IIX",
                 "VVX",
-                "IVX",
+                "IVX-",
                 "IIIX",
                 "VIX",
-                "IIIL",
+                "INIILN",
                 "IIID",
-                "IIIM",
+                "IIINM",
                 "IIIC",
-                "IIIVX",
-                "IIXIV",
-                "IXIIXIV",
+                "IIIVXN",
+                "IIXIVN",
+                "IXNIIXINV",
                 "LLLC",
                 "LLC",
-                "XXXC",
+                "XXXC-",
                 "LLD",
-                "LLLM",
+                "LLNLM",
                 "DDM",
                 "XMXXM",
                 "IIM",
                 "IIL",
-                "IIC",
-                "IID",
+                "I-IC",
+                "INID",
                 "MDDM",
-                "MCCM",
-                "MCCCM",
+                "MCC-M",
+                "M-CCC-M",
                 "MVIM",
                 "VIIM",
                 "VIIC",
                 "VIIX",
                 "VIID",
                 "VIIL",
-                "IVID",
-                "IVIM",
-                "IVIC",
-                "IVIXX",
+                "IVID--",
+                "IV-IM",
+                "I-VIC",
+                "IVIX-X",
+                "-NX",
+                "X-",
             };
             foreach (String illegal in illegals)
             {
@@ -408,6 +414,18 @@ namespace Tests
                 () => RomanNumber.Parse(illegal),
                 $"'{illegal}' -> Exception");
             }
+
+        }
+
+        [TestMethod]
+        public void TestAdd()
+        {
+            RomanNumber r1 = new(10);
+            RomanNumber r2 = new(20);
+            Assert.AreEqual("XXX" ,r1.Add(r2).ToString() );
+            Assert.AreEqual(30 ,r1.Add(r2).Value );
+            Assert.AreEqual("XXX" ,r2.Add(r1).ToString() );
+            Assert.AreEqual(30, r2.Add(r1).Value);
 
         }
     }
