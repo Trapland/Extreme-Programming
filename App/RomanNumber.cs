@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace App
 {
-    public class RomanNumber
+    public record RomanNumber
     {
         private const char ZERO_DIGIT = 'N';
         private const char MINUS_SIGN = '-';
         private const char DIGIT_QUOTE = '\'';
         private const String INVALID_DIGIT_MESSAGE = "Invalid Roman digit(s):";
         private const String EMPTY_INPUT_MESSAGE = "Null or empty input";
+        private const String ADD_NULL_MESSAGE = "Cannot Add null object";
+        private const String INVALID_DATA_SUM_MESSAGE = "Invalid Sum() invocation with NULL argument";
+        private const String SUM_NULL_MESSAGE = "Invalid Sum() invocation with NULL argument";
+        private const String NULL_MESSAGE_PATTERN = "{0}: '{1}'";
         private const String DIGITS_SEPARATOR = ", ";
 
         public int Value { get; set; }
@@ -90,8 +94,53 @@ namespace App
 
         public RomanNumber Add(RomanNumber number)
         {
-            return new() { Value = Value + number.Value};
+            if(number is null)
+            {
+                throw new ArgumentNullException(String.Format(NULL_MESSAGE_PATTERN,ADD_NULL_MESSAGE, nameof(number)));
+            }
+            return this with { Value = this.Value + number.Value};
         }
+
+        public RomanNumber Add(params RomanNumber[] numbers) //этот мой
+        {
+
+            RomanNumber sum = new() { Value = Value};
+            for (int i = 0; i < numbers.Length; i++)
+            {
+                sum.Value += numbers[i].Value;
+            }
+            return sum;
+        }
+
+        public static RomanNumber Sum(params RomanNumber[] numbers)
+        {
+            if (numbers is null)
+            {
+                throw new ArgumentNullException(
+                    String.Format(NULL_MESSAGE_PATTERN,
+                    SUM_NULL_MESSAGE,
+                    nameof(numbers))
+                    );
+            }
+            //if(numbers.Length == 1)
+            //{
+            //    throw new ArgumentException(INVALID_DATA_SUM_MESSAGE + numbers.ToString());
+            //}
+            //RomanNumber sum = new(0);
+            //for (int i = 0; i < numbers.Length; i++)
+            //{
+            //    sum.Value += numbers[i].Value;
+            //}
+            int res = 0;
+            foreach (var item in numbers)
+            {
+                res += item.Value;
+            }
+            return new(res);
+
+            // return new(numbers.Sum(n => n.Value));
+        }
+
 
         public static RomanNumber Parse(string input)
         {

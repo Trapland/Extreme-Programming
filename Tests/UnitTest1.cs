@@ -1,4 +1,6 @@
 using App; // додати залежність (Dependencies - Project Reference) від проєкту App
+using System.Linq;
+
 namespace Tests
 {
     [TestClass]
@@ -366,8 +368,8 @@ namespace Tests
         [TestMethod]
         public void TestParseIllegal()
         {
-            String[] illegals = 
-            { 
+            String[] illegals =
+            {
                 "IIV",
                 "IIX",
                 "VVX",
@@ -422,11 +424,66 @@ namespace Tests
         {
             RomanNumber r1 = new(10);
             RomanNumber r2 = new(20);
-            Assert.AreEqual("XXX" ,r1.Add(r2).ToString() );
-            Assert.AreEqual(30 ,r1.Add(r2).Value );
-            Assert.AreEqual("XXX" ,r2.Add(r1).ToString() );
+            Assert.AreEqual("XXX", r1.Add(r2).ToString());
+            Assert.AreEqual(30, r1.Add(r2).Value);
+            Assert.AreEqual("XXX", r2.Add(r1).ToString());
             Assert.AreEqual(30, r2.Add(r1).Value);
+            Assert.AreEqual("L", r2.Add(r1,r1,r1).ToString());
+            Assert.AreEqual(50, r2.Add(r1, r1,r1).Value);
 
+            //var ex = Assert.ThrowsException<ArgumentNullException>(
+            //() => r1.Add(null!),
+            //$"r1.Add(null!) -> ArgumentNullException");
+
+            //Assert.IsTrue(
+            //    ex.Message.Contains("Cannot Add null object", StringComparison.OrdinalIgnoreCase),
+            //    $"ex.Message{ex.Message} should Contain 'Cannot Add null object'"
+            //    );
+            //Assert.AreNotSame(r2,r2.Add(r1),"Add() should return new item");
+            // "Cannot Add null object"
+        }
+
+        [TestMethod]
+        public void TestSum()
+        {
+            RomanNumber r1 = new(10);
+            RomanNumber r2 = new(20);
+            var r3 = RomanNumber.Sum(r1, r2);
+            Assert.IsInstanceOfType(r3, typeof(RomanNumber));
+            Assert.AreNotSame(r3, r1);
+            Assert.AreNotSame(r3, r2);
+            Assert.AreEqual(60, RomanNumber.Sum(r1, r2, r3).Value);
+
+            var ex = Assert.ThrowsException<ArgumentNullException>(
+                () => RomanNumber.Sum(null!),
+                "Sum(null!) ThrowsException: ArgumentNullException");
+            String expectedFragment = "Invalid Sum() invocation with NULL argument";
+            Assert.IsTrue(ex.Message.Contains(expectedFragment,StringComparison.OrdinalIgnoreCase), $"ex.Message should Contain {expectedFragment}");
+
+            var emptyArr = Array.Empty<RomanNumber>();
+            Assert.AreEqual(0,RomanNumber.Sum(emptyArr).Value, "Sum(empty) == 0");
+            Assert.AreEqual(0,RomanNumber.Sum().Value, "Sum(empty) == 0");
+
+            Assert.AreEqual(10, RomanNumber.Sum(r1).Value, "Sum(r1) == 10");
+
+            Assert.AreEqual(0, RomanNumber.Sum(new(10), new(-10)).Value);
+            Assert.AreEqual(-1, RomanNumber.Sum(new(10), new(-11)).Value);
+            Assert.AreEqual(1, RomanNumber.Sum(new(10), new(-9)).Value);
+            int random = 0;
+            int random2 = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                random = Random.Shared.Next(3001) - 3000;
+                random2 = Random.Shared.Next(3001) - 3000;
+                Assert.AreEqual(random + random2, RomanNumber.Sum(new(random), new(random2)).Value, $"{random} + {random2} == {random + random2}");
+            }
+            Random r = new();
+            for (int i = 0; i < 256; i++)
+            {
+                RomanNumber x  = new(r.Next(-3000, 3000));
+                RomanNumber y  = new(r.Next(-3000, 3000));
+                Assert.AreEqual(x.Add(y).Value, RomanNumber.Sum(x,y).Value, $"{x} + {y} == x + y");
+            }
         }
     }
 }
