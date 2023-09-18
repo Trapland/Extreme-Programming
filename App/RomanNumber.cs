@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -11,7 +13,9 @@ namespace App
     {
         private const char ZERO_DIGIT = 'N';
         private const char MINUS_SIGN = '-';
+        private const char PLUS_SIGN = '+';
         private const char DIGIT_QUOTE = '\'';
+        private const char SPACE = ' ';
         private const String INVALID_DIGIT_MESSAGE = "Invalid Roman digit(s):";
         private const String EMPTY_INPUT_MESSAGE = "Null or empty input";
         private const String ADD_NULL_MESSAGE = "Cannot Add null object";
@@ -94,17 +98,17 @@ namespace App
 
         public RomanNumber Add(RomanNumber number)
         {
-            if(number is null)
+            if (number is null)
             {
-                throw new ArgumentNullException(String.Format(NULL_MESSAGE_PATTERN,ADD_NULL_MESSAGE, nameof(number)));
+                throw new ArgumentNullException(String.Format(NULL_MESSAGE_PATTERN, ADD_NULL_MESSAGE, nameof(number)));
             }
-            return this with { Value = this.Value + number.Value};
+            return this with { Value = this.Value + number.Value };
         }
 
         public RomanNumber Add(params RomanNumber[] numbers) //этот мой
         {
 
-            RomanNumber sum = new() { Value = Value};
+            RomanNumber sum = new() { Value = Value };
             for (int i = 0; i < numbers.Length; i++)
             {
                 sum.Value += numbers[i].Value;
@@ -141,6 +145,65 @@ namespace App
             // return new(numbers.Sum(n => n.Value));
         }
 
+        public static RomanNumber Eval(string input)
+        {
+            if (input is null)
+            {
+                throw new ArgumentNullException(String.Format(NULL_MESSAGE_PATTERN, ADD_NULL_MESSAGE, nameof(input)));
+            }
+            input = input.Trim();
+            String[] nums = new String[3];
+            int counter = 0;
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (input[i] == SPACE)
+                    continue;
+                if (i == 0 && (input[i] == MINUS_SIGN))
+                {
+                    nums[0] += input[i];
+                    continue;
+                }
+                else if (i == 0 && (input[i] == PLUS_SIGN))
+                    throw new ArgumentException(String.Format(NULL_MESSAGE_PATTERN, INVALID_DIGIT_MESSAGE, nameof(input)));
+                if ((input[i] == PLUS_SIGN || input[i] == MINUS_SIGN) && counter == 0)
+                {
+                    counter += 2;
+                    nums[1] = input[i].ToString();
+
+                }
+                else if ((input[i] == PLUS_SIGN || input[i] == MINUS_SIGN) && (counter == 2) && i > 0 && (input[i - 1] == PLUS_SIGN))
+                {
+                    throw new ArgumentException(String.Format(NULL_MESSAGE_PATTERN, INVALID_DIGIT_MESSAGE, nameof(input)));
+                }
+                else
+                {
+                    nums[counter] += input[i];
+                }
+            }
+            if (nums.Length > 3)
+                throw new ArgumentException(String.Format(NULL_MESSAGE_PATTERN, INVALID_DIGIT_MESSAGE, nameof(input)));
+            if (input[0] == '+' || nums[2][0] == '+')
+            {
+                throw new ArgumentException(String.Format(NULL_MESSAGE_PATTERN, INVALID_DIGIT_MESSAGE, nameof(input)));
+            }
+            RomanNumber x = RomanNumber.Parse(nums[0]);
+
+            String digit = nums[1];
+
+            RomanNumber y = RomanNumber.Parse(nums[2]);
+
+
+            return new(RomanNumber.Parse(nums[0]).Add(nums[1] == MINUS_SIGN.ToString() ? new RomanNumber(-y.Value) : y));
+        }
+
+
+
+
+
+        //if (digit == MINUS_SIGN.ToString()) {y.Value = -y.Value;}
+
+        //return new(x.Add(y));
 
         public static RomanNumber Parse(string input)
         {
@@ -162,7 +225,7 @@ namespace App
                 result += prev <= digitValue ? digitValue : -digitValue;
                 prev = digitValue;
             }
-            
+
 
             return new() { Value = result * (1 - 2 * lastDigitIndex) };
             //}
@@ -241,11 +304,11 @@ namespace App
                 throw new ArgumentException(EMPTY_INPUT_MESSAGE);
             }
 
-            if(input.StartsWith(MINUS_SIGN))
+            if (input.StartsWith(MINUS_SIGN))
             {
                 input = input[1..];
             }
-            if(input.Contains(MINUS_SIGN))
+            if (input.Contains(MINUS_SIGN))
             {
                 throw new ArgumentException($"{INVALID_DIGIT_MESSAGE} {DIGIT_QUOTE}{MINUS_SIGN}{DIGIT_QUOTE}");
             }
@@ -312,7 +375,7 @@ namespace App
                 'C' => 100,
                 'D' => 500,
                 'M' => 1000,
-                 _ => throw new ArgumentException($"{INVALID_DIGIT_MESSAGE} {DIGIT_QUOTE}{digit}{DIGIT_QUOTE}")
+                _ => throw new ArgumentException($"{INVALID_DIGIT_MESSAGE} {DIGIT_QUOTE}{digit}{DIGIT_QUOTE}")
                 // із зміною вимог - залишити у повідомленні усі неправильні символи
             };
         }

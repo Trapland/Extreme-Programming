@@ -428,8 +428,8 @@ namespace Tests
             Assert.AreEqual(30, r1.Add(r2).Value);
             Assert.AreEqual("XXX", r2.Add(r1).ToString());
             Assert.AreEqual(30, r2.Add(r1).Value);
-            Assert.AreEqual("L", r2.Add(r1,r1,r1).ToString());
-            Assert.AreEqual(50, r2.Add(r1, r1,r1).Value);
+            Assert.AreEqual("L", r2.Add(r1, r1, r1).ToString());
+            Assert.AreEqual(50, r2.Add(r1, r1, r1).Value);
 
             //var ex = Assert.ThrowsException<ArgumentNullException>(
             //() => r1.Add(null!),
@@ -458,11 +458,11 @@ namespace Tests
                 () => RomanNumber.Sum(null!),
                 "Sum(null!) ThrowsException: ArgumentNullException");
             String expectedFragment = "Invalid Sum() invocation with NULL argument";
-            Assert.IsTrue(ex.Message.Contains(expectedFragment,StringComparison.OrdinalIgnoreCase), $"ex.Message should Contain {expectedFragment}");
+            Assert.IsTrue(ex.Message.Contains(expectedFragment, StringComparison.OrdinalIgnoreCase), $"ex.Message should Contain {expectedFragment}");
 
             var emptyArr = Array.Empty<RomanNumber>();
-            Assert.AreEqual(0,RomanNumber.Sum(emptyArr).Value, "Sum(empty) == 0");
-            Assert.AreEqual(0,RomanNumber.Sum().Value, "Sum(empty) == 0");
+            Assert.AreEqual(0, RomanNumber.Sum(emptyArr).Value, "Sum(empty) == 0");
+            Assert.AreEqual(0, RomanNumber.Sum().Value, "Sum(empty) == 0");
 
             Assert.AreEqual(10, RomanNumber.Sum(r1).Value, "Sum(r1) == 10");
 
@@ -480,13 +480,98 @@ namespace Tests
             Random r = new();
             for (int i = 0; i < 256; i++)
             {
-                RomanNumber x  = new(r.Next(-3000, 3000));
-                RomanNumber y  = new(r.Next(-3000, 3000));
-                Assert.AreEqual(x.Add(y).Value, RomanNumber.Sum(x,y).Value, $"{x} + {y} == x + y");
+                RomanNumber x = new(r.Next(-3000, 3000));
+                RomanNumber y = new(r.Next(-3000, 3000));
+                Assert.AreEqual(x.Add(y).Value, RomanNumber.Sum(x, y).Value, $"{x} + {y} == x + y");
+            }
+        }
+
+        [TestMethod]
+        public void TestEval()
+        {
+            RomanNumber res = RomanNumber.Eval("IV + XL");
+            Assert.IsInstanceOfType(RomanNumber.Eval("IV + XL"), typeof(RomanNumber));
+            Assert.IsNotNull(RomanNumber.Eval("IV + XL"));
+            Assert.AreEqual("XLIV", res.ToString(), "Sum(res.ToString()) == XLIV");
+            var ex = Assert.ThrowsException<ArgumentNullException>(
+                () => RomanNumber.Eval(null!),
+                "Eval(null!) ThrowsException: ArgumentNullException");
+            Random r = new();
+            for (int i = 0; i < 256; i++)
+            {
+                RomanNumber x = new(r.Next(-1000, 1000));
+                RomanNumber y = new(r.Next(-1000, 1000));
+                RomanNumber ans = RomanNumber.Eval($"{x.ToString()} + {y.ToString()}");
+                Assert.AreEqual(x.Add(y), ans);
+                Assert.AreEqual(RomanNumber.Sum(x, y), ans);
+            }
+
+
+        }
+        [TestMethod]
+        public void TestEvalIllegal()
+        {
+            Dictionary<String, int> illegal = new()
+            {
+                {"   XL    +    II   ", 42 },
+                {"XL+II", 42 },
+                {"XL--II", 42 },
+                {"-X - II", -12 },
+                {"-X + II", -8 },
+                {"-X - -II" , -8 },
+                {"-X + -II", -12 },
+            };
+
+            foreach (var item in illegal)
+            {
+                Assert.AreEqual(item.Value,
+                    RomanNumber.Eval(item.Key).Value, 
+                    $"{item.Key} -> {item.Value}");
+            }
+        }
+        [TestMethod]
+        public void TestEvalNonValid()
+        {
+            var ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("IIC + II"),
+                "Eval(IIC + II) ThrowsException: Invalid number");
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("AX + II"),
+                "Eval(AX + II) ThrowsException: Invalid number");
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("X + II + X"),
+                "Eval(X + II + X) ThrowsException: Invalid number");
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("+X + X"),
+                "Eval(+X + X) ThrowsException: Invalid number");
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("X + +X"),
+                "Eval(X + +X) ThrowsException: Invalid number");
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("-X +- II"),
+                "Eval(-X +- II) ThrowsException: Invalid number");
+            ex = Assert.ThrowsException<ArgumentException>(
+                () => RomanNumber.Eval("+X"),
+                "Eval(+X) ThrowsException: Invalid number");
+        }
+        [TestMethod]
+        public void TestEvalSubstraction()
+        {
+            Random r = new();
+            for (int i = 0; i < 256; i++)
+            {
+                RomanNumber x = new(r.Next(-1000, 1000));
+                RomanNumber y = new(r.Next(-1000, 1000));
+                RomanNumber ansNegativ = RomanNumber.Eval($"{x.ToString()} - {y.ToString()}");
+                y.Value = -y.Value;
+                Assert.AreEqual(x.Add(y), ansNegativ);
+                Assert.AreEqual(RomanNumber.Sum(x, y), ansNegativ);
             }
         }
     }
 }
+
+
 
 /* Тестування виключень(exceptions)
  * У системі тестування виключення - провали тесту.
